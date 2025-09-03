@@ -50,6 +50,7 @@ services:
       - '8081:8081'
     depends_on:
       - statistics-service-db
+      - kafka-broker
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://statistics-service-db:5433/postgres
       POSTGRES_USER: ${POSTGRES_USER}
@@ -93,19 +94,18 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 1
+    networks:
+      - app-net
   frontend:
     container_name: frontend
     build: frontend/cloud-storage-frontend/.
     ports:
       - '80:80'
     restart: unless-stopped
+    depends_on:
+      - api-gateway-service
     networks:
       - app-net
-    depends_on:
-      api-gateway-service:
-        condition: service_started
-      statistics-service:
-        condition: service_started
 
 networks:
   app-net:
