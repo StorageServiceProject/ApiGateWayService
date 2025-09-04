@@ -26,12 +26,12 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic resourceInfoRequestedTopic() {
-        return TopicBuilder.name("events-resource-info-requested").partitions(3).replicas(2).build();
+        return TopicBuilder.name("events-resource-info-requested").partitions(3).replicas(1).build();
     }
 
     @Bean
     public NewTopic directoryResourcesInfoRequestedTopic() {
-        return TopicBuilder.name("events-directory-resources-info-requested").partitions(2).replicas(1).build();
+        return TopicBuilder.name("events-directory-resources-info-requested").partitions(3).replicas(1).build();
     }
 
     @Bean
