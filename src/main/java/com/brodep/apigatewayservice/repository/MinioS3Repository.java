@@ -3,6 +3,7 @@ package com.brodep.apigatewayservice.repository;
 import com.brodep.apigatewayservice.configuration.beans.MinioProperties;
 import com.brodep.apigatewayservice.dto.response.ResourceInfoResponse;
 import com.brodep.apigatewayservice.exeption.AlreadyExistsException;
+import com.brodep.apigatewayservice.exeption.ResourceNotFoundException;
 import io.minio.*;
 import io.minio.messages.Item;
 import jakarta.annotation.PostConstruct;
@@ -31,6 +32,7 @@ public class MinioS3Repository implements S3Repository {
 
     @PostConstruct
     public void init() {
+        log.info("Initialisation connection to minio");
         try {
             minioClient = MinioClient.builder()
                     .endpoint(minioProperties.getHost())
@@ -39,7 +41,9 @@ public class MinioS3Repository implements S3Repository {
         } catch (Exception e) {
             log.error("Error connecting to minio");
         }
+        log.info("Connection to minio is established");
         bucketName = minioProperties.getBucketName();
+        log.info("Creating bucket with name {}", bucketName);
         try {
             var bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!bucketExists) {
@@ -48,6 +52,7 @@ public class MinioS3Repository implements S3Repository {
         } catch (Exception e) {
             log.error("Error creation Bucket {}", bucketName);
         }
+        log.info("Bucket {} has been created", bucketName);
     }
 
     @Override
@@ -56,6 +61,7 @@ public class MinioS3Repository implements S3Repository {
         try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
             for (MultipartFile file : files) {
                 executorService.submit(() -> {
+                    log.info("Created new thread for uploading file {}", file.getOriginalFilename());
                     try {
                         minioClient.putObject(
                                 PutObjectArgs.builder()
@@ -71,6 +77,7 @@ public class MinioS3Repository implements S3Repository {
                                         .object(path + file.getOriginalFilename())
                                         .build());
                         response.add(objectToResourceInfoResponse(stream));
+                        log.info("File {} has been uploaded, thread is being closed", file.getOriginalFilename());
                     } catch (Exception e) {
                         log.error("Error uploading file {}", file.getOriginalFilename());
                         throw new AlreadyExistsException("Файл с именем %s уже существует".formatted(file.getName()));
@@ -92,7 +99,7 @@ public class MinioS3Repository implements S3Repository {
             );
         } catch (Exception e) {
             log.error("Error deleting file with path {}", path);
-            throw new RuntimeException();
+            throw new ResourceNotFoundException("Файл с путем %s не удалось удалить".formatted(path));
         }
     }
 
@@ -107,7 +114,7 @@ public class MinioS3Repository implements S3Repository {
             return stream.readAllBytes();
         } catch (Exception e) {
             log.error("Error downloading file with path {}", path);
-            throw new RuntimeException();
+            throw new ResourceNotFoundException("Файл с путем %s не удалось скачать".formatted(path));
         }
     }
 
@@ -130,7 +137,7 @@ public class MinioS3Repository implements S3Repository {
             return objectToResourceInfoResponse(stream);
         } catch (Exception e) {
             log.error("Error getting info of file with path {}", path);
-            throw new RuntimeException();
+            throw new ResourceNotFoundException("Не удалось найти информацию о файле с путем %s".formatted(path));
         }
     }
 
@@ -159,7 +166,7 @@ public class MinioS3Repository implements S3Repository {
             return response;
         } catch (Exception e) {
             log.error("Error getting info of files in directory with path {}", path);
-            throw new RuntimeException();
+            throw new ResourceNotFoundException("Не удалось получить информацию о файлах с путем %s".formatted(path));
         }
     }
 

@@ -19,6 +19,7 @@ public class ResourceService {
     private final S3Repository s3Repository;
 
     private String getUserPath(String path) {
+        log.info("");
         var userId = userService.getCurrentUser().getId().toString();
         if (path == null) {
             return "user-%s-files/".formatted(userId);
@@ -27,22 +28,27 @@ public class ResourceService {
     }
 
     public ResourceInfoResponse getResourceInfo(String path) {
+        log.info("");
         return s3Repository.getInfo(getUserPath(path));
     }
 
     public void deleteResource(String path) {
+        log.info("");
         s3Repository.delete(path);
     }
 
     public byte[] downloadResource(String path) {
+        log.info("");
         return s3Repository.download(path);
     }
 
     public Set<ResourceInfoResponse> uploadResources(String path, List<MultipartFile> files) {
+        log.info("");
         return s3Repository.upload(getUserPath(path), files);
     }
 
     public Set<ResourceInfoResponse> getDirectoryResources(String path) {
+        log.info("");
         return s3Repository.getDirectoryResources(path);
     }
 }
