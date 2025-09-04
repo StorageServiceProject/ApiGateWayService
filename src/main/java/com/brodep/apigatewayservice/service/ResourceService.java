@@ -17,6 +17,7 @@ public class ResourceService {
 
     private final UserService userService;
     private final S3Repository s3Repository;
+    private final KafkaProducerService kafkaProducerService;
 
     private String getUserPath(String path) {
         log.info("");
@@ -28,27 +29,31 @@ public class ResourceService {
     }
 
     public ResourceInfoResponse getResourceInfo(String path) {
-        log.info("");
-        return s3Repository.getInfo(getUserPath(path));
+        var res = s3Repository.getInfo(getUserPath(path));
+        kafkaProducerService.sendResourceInfoRequestedEvent(getUserPath(path));
+        return res;
     }
 
     public void deleteResource(String path) {
-        log.info("");
         s3Repository.delete(path);
+        kafkaProducerService.sendResourceDeletedEvent(path);
     }
 
     public byte[] downloadResource(String path) {
-        log.info("");
-        return s3Repository.download(path);
+        var res = s3Repository.download(path);
+        kafkaProducerService.sendResourceDownloadedEvent(path);
+        return res;
     }
 
     public Set<ResourceInfoResponse> uploadResources(String path, List<MultipartFile> files) {
-        log.info("");
-        return s3Repository.upload(getUserPath(path), files);
+        var res = s3Repository.upload(getUserPath(path), files);
+        kafkaProducerService.sendResourceUploadedEvent(getUserPath(path));
+        return res;
     }
 
     public Set<ResourceInfoResponse> getDirectoryResources(String path) {
-        log.info("");
-        return s3Repository.getDirectoryResources(path);
+        var res = s3Repository.getDirectoryResources(path);
+        kafkaProducerService.sendDirectoryResourcesInfoRequestedEvent(path);
+        return res;
     }
 }
