@@ -22,6 +22,5 @@ spring:
 s3:
   host: ${SPRING_MINIO_HOST:http://127.0.0.1:9000}
   bucket-name: user-files
-  credentials:
-    username: ${MINIO_ROOT_USER}
-    password: ${MINIO_ROOT_PASSWORD}
+  username: ${MINIO_ROOT_USER}
+  password: ${MINIO_ROOT_PASSWORD}

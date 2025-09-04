@@ -20,11 +20,14 @@ public class AuthService {
     private final UserMapper userMapper;
 
     public UserResponse signIn(UserRequest userRequest, HttpServletRequest request) throws ServletException {
+        log.info("Пользователь {} входит в аккаунт", userRequest.username());
+        log.info("Предыдущая сессия {} инвалидируется", request.getSession().getId());
         request.getSession().invalidate();
         request.login(
                 userRequest.username(),
                 userRequest.password()
         );
+        log.info("Пользователь {} успешно вошел в аккаунт", userRequest.username());
         return new UserResponse(userRequest.username());
     }
 

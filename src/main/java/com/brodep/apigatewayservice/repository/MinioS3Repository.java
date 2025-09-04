@@ -1,12 +1,13 @@
 package com.brodep.apigatewayservice.repository;
 
+import com.brodep.apigatewayservice.configuration.beans.MinioProperties;
 import com.brodep.apigatewayservice.dto.response.ResourceInfoResponse;
 import com.brodep.apigatewayservice.exeption.AlreadyExistsException;
 import io.minio.*;
 import io.minio.messages.Item;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,29 +21,25 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MinioS3Repository implements S3Repository {
 
     private MinioClient minioClient;
 
-    @Value("${s3.host}")
-    private String host;
-    @Value("${s3.bucket-name}")
+    private final MinioProperties minioProperties;
     private String bucketName;
-    @Value("${s3.credentials.username}")
-    private String username;
-    @Value("${s3.credentials.password}")
-    private String password;
 
     @PostConstruct
     public void init() {
         try {
             minioClient = MinioClient.builder()
-                    .endpoint(host)
-                    .credentials(username, password)
+                    .endpoint(minioProperties.getHost())
+                    .credentials(minioProperties.getUsername(), minioProperties.getPassword())
                     .build();
         } catch (Exception e) {
             log.error("Error connecting to minio");
         }
+        bucketName = minioProperties.getBucketName();
         try {
             var bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!bucketExists) {
