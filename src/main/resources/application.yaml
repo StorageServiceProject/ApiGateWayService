@@ -20,7 +20,7 @@ spring:
       repository-type: indexed
       namespace: spring:session
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVER:localhost:9092}
 s3:
   host: ${SPRING_MINIO_HOST:http://127.0.0.1:9000}
   bucket-name: user-files
