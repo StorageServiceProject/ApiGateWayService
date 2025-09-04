@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class AuthService {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    @Transactional
     public UserResponse signIn(UserRequest userRequest, HttpServletRequest request) throws ServletException {
         log.info("Пользователь {} входит в аккаунт", userRequest.username());
         log.info("Предыдущая сессия {} инвалидируется", request.getSession().getId());
@@ -31,6 +33,7 @@ public class AuthService {
         return new UserResponse(userRequest.username());
     }
 
+    @Transactional
     public UserResponse signUp(UserRequest userRequest){
         log.info("Пользователь {} начал регистрацию", userRequest.username());
         if (userService.existsByUserName(userRequest.username())) {
