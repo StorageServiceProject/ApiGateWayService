@@ -36,12 +36,12 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic resourceDeletedTopic() {
-        return TopicBuilder.name("events-resource-deleted").partitions(3).replicas(2).build();
+        return TopicBuilder.name("events-resource-deleted").partitions(3).replicas(1).build();
     }
 
     @Bean
     public NewTopic resourceUploadedTopic() {
-        return TopicBuilder.name("events-resource-uploaded").partitions(3).replicas(2).build();
+        return TopicBuilder.name("events-resource-uploaded").partitions(3).replicas(1).build();
     }
 
     @Bean
