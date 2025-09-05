@@ -18,32 +18,32 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, MinioEvent> kafkaTemplate;
 
-    public void sendResourceInfoRequestedEvent(String key){
-        kafkaTemplate.send("events-resource-info-requested", key, new MinioEvent())
+    public void sendResourceInfoRequestedEvent(String key, MinioEvent event){
+        kafkaTemplate.send("events-resource-info-requested", key, event)
                 .thenAccept(kafkaSuccessLogger())
                 .exceptionally(kafkaProducingFailedLogger());
     }
 
-    public void sendDirectoryResourcesInfoRequestedEvent(String key){
-        kafkaTemplate.send("events-directory-resources-info-requested", key, new MinioEvent())
+    public void sendDirectoryResourcesInfoRequestedEvent(String key, MinioEvent event){
+        kafkaTemplate.send("events-directory-resources-info-requested", key, event)
                 .thenAccept(kafkaSuccessLogger())
                 .exceptionally(kafkaProducingFailedLogger());
     }
 
-    public void sendResourceDeletedEvent(String key){
-        kafkaTemplate.send("events-resource-deleted", key, new MinioEvent())
+    public void sendResourceDeletedEvent(String key, MinioEvent event){
+        kafkaTemplate.send("events-resource-deleted", key, event)
                 .thenAccept(kafkaSuccessLogger())
                 .exceptionally(kafkaProducingFailedLogger());
     }
 
-    public void sendResourceUploadedEvent(String key){
-        kafkaTemplate.send("events-resource-uploaded", key, new MinioEvent())
+    public void sendResourceUploadedEvent(String key, MinioEvent event){
+        kafkaTemplate.send("events-resource-uploaded", key, event)
                 .thenAccept(kafkaSuccessLogger())
                 .exceptionally(kafkaProducingFailedLogger());
     }
 
-    public void sendResourceDownloadedEvent(String key){
-        kafkaTemplate.send("events-resource-downloaded", key, new MinioEvent())
+    public void sendResourceDownloadedEvent(String key, MinioEvent event){
+        kafkaTemplate.send("events-resource-downloaded", key, event)
                 .thenAccept(kafkaSuccessLogger())
                 .exceptionally(kafkaProducingFailedLogger());
     }

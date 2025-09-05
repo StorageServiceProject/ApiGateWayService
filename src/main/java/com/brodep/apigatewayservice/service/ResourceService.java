@@ -1,5 +1,6 @@
 package com.brodep.apigatewayservice.service;
 
+import com.brodep.apigatewayservice.dto.event.MinioEvent;
 import com.brodep.apigatewayservice.dto.response.ResourceInfoResponse;
 import com.brodep.apigatewayservice.repository.S3Repository;
 import lombok.RequiredArgsConstructor;
@@ -30,30 +31,40 @@ public class ResourceService {
 
     public ResourceInfoResponse getResourceInfo(String path) {
         var res = s3Repository.getInfo(getUserPath(path));
-        kafkaProducerService.sendResourceInfoRequestedEvent(getUserPath(path));
+        kafkaProducerService.sendResourceInfoRequestedEvent(getUserPath(path), new MinioEvent(
+                1
+        ));
         return res;
     }
 
     public void deleteResource(String path) {
         s3Repository.delete(path);
-        kafkaProducerService.sendResourceDeletedEvent(path);
+        kafkaProducerService.sendResourceDeletedEvent(path, new MinioEvent(
+                1
+        ));
     }
 
     public byte[] downloadResource(String path) {
         var res = s3Repository.download(path);
-        kafkaProducerService.sendResourceDownloadedEvent(path);
+        kafkaProducerService.sendResourceDownloadedEvent(path, new MinioEvent(
+                1
+        ));
         return res;
     }
 
     public Set<ResourceInfoResponse> uploadResources(String path, List<MultipartFile> files) {
         var res = s3Repository.upload(getUserPath(path), files);
-        kafkaProducerService.sendResourceUploadedEvent(getUserPath(path));
+        kafkaProducerService.sendResourceUploadedEvent(getUserPath(path), new MinioEvent(
+                res.size()
+        ));
         return res;
     }
 
     public Set<ResourceInfoResponse> getDirectoryResources(String path) {
         var res = s3Repository.getDirectoryResources(path);
-        kafkaProducerService.sendDirectoryResourcesInfoRequestedEvent(path);
+        kafkaProducerService.sendDirectoryResourcesInfoRequestedEvent(path, new MinioEvent(
+                res.size()
+        ));
         return res;
     }
 }
